@@ -1,6 +1,5 @@
-package Servlets;
+package HTTPTest;
 
-import Service.CurrenciesService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,13 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/testPage")
-public class TestHTML extends HttpServlet {
+@WebServlet("/test")
+public class TestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        CurrenciesService currenciesService = new CurrenciesService();
-        resp.setContentType("text/html");
-
-        req.getRequestDispatcher("index.html").forward(req, resp);
+        resp.getWriter().write("Hello World");
     }
 }

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter("/currencies")
+@WebFilter(value = {"/currencies","/currency/*","/exchangeRate/*","/exchangeRates","/exchange"})
 public class FilterServlets  implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

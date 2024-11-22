@@ -1,5 +1,7 @@
 package Utils;
 
+import Exceptions.SomeThingWrongWithBDException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -15,7 +17,7 @@ public class PropertiesUtil {
         try(InputStream inputStream = PropertiesUtil.class.getClassLoader().getResourceAsStream("application.properties")){
             properties.load(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new SomeThingWrongWithBDException();
         }
 
     }

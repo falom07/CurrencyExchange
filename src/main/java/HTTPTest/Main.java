@@ -1,12 +1,14 @@
 package HTTPTest;
 
 import DAO.CurrenciesDAO;
-import DTO.CurrenciesDTO;
-import Entity.CurrenciesEntity;
+import Exceptions.SomeThingWrongWithBDException;
+
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         CurrenciesDAO currenciesDAO = CurrenciesDAO.getInstance();
-        System.out.println(currenciesDAO.add(new CurrenciesEntity(1,"name","full name","77")));
+        System.out.println(currenciesDAO.readAll().get(1));
+
     }
 }

@@ -1,18 +1,23 @@
 package Entity;
 
-public class CurrenciesEntity {
+public class CurrencyEntity {
     private Integer id;
     private String code;
     private String fullName;
     private String sign;
 
-    public CurrenciesEntity(Integer id, String code, String fullName, String sign) {
+    public CurrencyEntity(Integer id, String code, String fullName, String sign) {
         this.id = id;
         this.code = code;
         this.fullName = fullName;
         this.sign = sign;
     }
-    public CurrenciesEntity() {}
+
+    public CurrencyEntity(String code) {
+        this.code = code;
+    }
+
+    public CurrencyEntity() {}
 
     public Integer getId() {
         return id;

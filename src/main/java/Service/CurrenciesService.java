@@ -2,43 +2,51 @@ package Service;
 
 import DAO.CurrenciesDAO;
 import DTO.CurrenciesDTO;
-import Entity.CurrenciesEntity;
+import Entity.CurrencyEntity;
+import Exceptions.EmptyFieldException;
+import Exceptions.SomeThingWrongWithBDException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CurrenciesService {
-    public List<CurrenciesDTO> getAllCurrencies(){
+    public List<CurrenciesDTO> getAllCurrencies()  {
         List<CurrenciesDTO> currenciesDTOList = new ArrayList<>();
-        List<CurrenciesEntity> currenciesDAO = CurrenciesDAO.getInstance().readAll();
-        for(CurrenciesEntity currenciesEntity : currenciesDAO){
+        List<CurrencyEntity> currenciesDAO = CurrenciesDAO.getInstance().readAll();
+        for(CurrencyEntity currencyEntity : currenciesDAO){
             currenciesDTOList.add(new CurrenciesDTO(
-                    currenciesEntity.getCode(),
-                    currenciesEntity.getFullName(),
-                    currenciesEntity.getSign()
+                    currencyEntity.getCode(),
+                    currencyEntity.getFullName(),
+                    currencyEntity.getSign()
             ));
         }
         return currenciesDTOList;
     }
 
-    public void add (CurrenciesDTO currenciesDTO){
-        CurrenciesEntity currencie = new CurrenciesEntity(
+    public CurrenciesDTO add (CurrenciesDTO currenciesDTO){
+        CurrencyEntity currency = new CurrencyEntity(
                 null,
                 currenciesDTO.getCode(),
                 currenciesDTO.getFullName(),
                 currenciesDTO.getSign()
         );
-        CurrenciesDAO.getInstance().add(currencie);
+        CurrencyEntity currencyEntity = CurrenciesDAO.getInstance().add(currency);
+        return new CurrenciesDTO(
+                currencyEntity.getCode(),
+                currencyEntity.getFullName(),
+                currencyEntity.getSign()
+        );
     }
-    public CurrenciesDTO getCurrenciesById(int id){
+
+
+    public CurrenciesDTO getCurrenciesByCode(String code){
         CurrenciesDAO currenciesDAO = CurrenciesDAO.getInstance();
-        CurrenciesEntity currencyEntity =  currenciesDAO.readOne(id);
+        CurrencyEntity currencyEntity =  currenciesDAO.readOne(code);
         CurrenciesDTO currenciesDTO = new CurrenciesDTO(
                 currencyEntity.getCode(),
                 currencyEntity.getFullName(),
                 currencyEntity.getSign()
         );
-
         return currenciesDTO;
     }
 }

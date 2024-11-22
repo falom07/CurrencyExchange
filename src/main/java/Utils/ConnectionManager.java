@@ -1,5 +1,7 @@
 package Utils;
 
+import Exceptions.SomeThingWrongWithBDException;
+
 import java.sql.*;
 
 public final class ConnectionManager {
@@ -10,16 +12,16 @@ public final class ConnectionManager {
         try{
             conn = DriverManager.getConnection(PropertiesUtil.getProperty(URL));
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SomeThingWrongWithBDException();
         }
         return conn;
     }
 
-    public static void closeConnection(Connection conn){
+    public static void closeConnection(Connection conn) {
         try{
             conn.close();
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new SomeThingWrongWithBDException();
         }
     }
 
