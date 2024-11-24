@@ -1,17 +1,17 @@
 package DTO;
 
-import Entity.CurrencyEntity;
+import Entity.Currency;
 
 import java.math.BigDecimal;
 
 public class ExchangeCurrenciesRateDTO {
-    private CurrencyEntity baseCurrency;
-    private CurrencyEntity targetCurrency;
+    private Currency baseCurrency;
+    private Currency targetCurrency;
     private BigDecimal rate;
     private BigDecimal amount;
     private BigDecimal convertAmount;
 
-    public ExchangeCurrenciesRateDTO(CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertAmount) {
+    public ExchangeCurrenciesRateDTO(Currency baseCurrency, Currency targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertAmount) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;
@@ -19,7 +19,7 @@ public class ExchangeCurrenciesRateDTO {
         this.convertAmount = convertAmount;
     }
 
-    public ExchangeCurrenciesRateDTO(CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, BigDecimal amount) {
+    public ExchangeCurrenciesRateDTO(Currency baseCurrency, Currency targetCurrency, BigDecimal amount) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.amount = amount;
@@ -28,19 +28,19 @@ public class ExchangeCurrenciesRateDTO {
     public ExchangeCurrenciesRateDTO() {
     }
 
-    public CurrencyEntity getBaseCurrency() {
+    public Currency getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(CurrencyEntity baseCurrency) {
+    public void setBaseCurrency(Currency baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
-    public CurrencyEntity getTargetCurrency() {
+    public Currency getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(CurrencyEntity targetCurrency) {
+    public void setTargetCurrency(Currency targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
 

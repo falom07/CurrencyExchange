@@ -1,15 +1,15 @@
 package DTO;
 
-import Entity.CurrencyEntity;
+import Entity.Currency;
 
 import java.math.BigDecimal;
 
 public class ExchangeRatesDTO {
-    private CurrencyEntity baseCurrency;
-    private CurrencyEntity targetCurrency;
+    private Currency baseCurrency;
+    private Currency targetCurrency;
     private BigDecimal rate;
 
-    public ExchangeRatesDTO(CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, BigDecimal rate) {
+    public ExchangeRatesDTO(Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;
@@ -17,19 +17,19 @@ public class ExchangeRatesDTO {
 
     public ExchangeRatesDTO() {}
 
-    public CurrencyEntity getBaseCurrency() {
+    public Currency getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(CurrencyEntity baseCurrency) {
+    public void setBaseCurrency(Currency baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
-    public CurrencyEntity getTargetCurrency() {
+    public Currency getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(CurrencyEntity targetCurrency) {
+    public void setTargetCurrency(Currency targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
 

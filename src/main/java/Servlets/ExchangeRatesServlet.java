@@ -17,42 +17,29 @@ import java.util.List;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        try {
-            ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
-            List<ExchangeRatesDTO> exchangeRates = exchangeRatesService.getAllExchangeRates();
+    protected void doGet(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
+        ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
 
-            Gson gson = new Gson();
-            String json = gson.toJson(exchangeRates);
-            response.getWriter().write(json);
-        }catch (Exception e){
-            String errorJson = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),response);
-            response.getWriter().write(errorJson);
-        }
+        List<ExchangeRatesDTO> exchangeRates = exchangeRatesService.getAllExchangeRates();
+
+        String json = new Gson().toJson(exchangeRates);
+        resp.getWriter().write(json);
+
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        try{
-            String baseCurrency = req.getParameter("baseCurrencyCode");
-            String targetCurrency = req.getParameter("targetCurrencyCode");
-            ValidationServlets.checkParametersExchangeForCorrect(baseCurrency,targetCurrency,req.getParameter("rate"));
+        ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
 
-            BigDecimal rate =  BigDecimal.valueOf(Double.parseDouble(req.getParameter("rate")));
+        String baseCurrency = req.getParameter("baseCurrencyCode");
+        String targetCurrency = req.getParameter("targetCurrencyCode");
 
-            ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
-            ExchangeRatesDTO exchangeRate = exchangeRatesService.addExchangeRates(baseCurrency,targetCurrency, rate);
+        ValidationServlets.checkParametersExchangeForCorrect(baseCurrency,targetCurrency,req.getParameter("rate"));    //place for validation
+        BigDecimal rate =  new BigDecimal(req.getParameter("rate"));
 
-            Gson gson = new Gson();
-            String json = gson.toJson(exchangeRate);
-            resp.getWriter().write(json);
-        }catch (Exception e){
-            String errorJson = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),resp);
-            resp.getWriter().write(errorJson);
-        }
+        ExchangeRatesDTO exchangeRate = exchangeRatesService.addExchangeRates(baseCurrency,targetCurrency, rate);
 
-
+        String json = new Gson().toJson(exchangeRate);
+        resp.getWriter().write(json);
     }
 }

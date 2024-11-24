@@ -19,46 +19,32 @@ import java.math.BigDecimal;
 public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        try {
-            String codesExchange = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/") + 1);
-            ValidationServlets.checkCodeLengthExchangeRates(codesExchange);
+        ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
 
-            ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
-            ExchangeRatesDTO exchangeRate = exchangeRatesService.getExchangeRate(codesExchange);
+        String codesExchange = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/") + 1);    //one from two variant how take info from url
+        ValidationServlets.checkCodeLengthExchangeRates(codesExchange);    //place for validation
 
-            String jsonRes = new Gson().toJson(exchangeRate);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(jsonRes);
-        }catch (Exception e){
-            String error = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),resp);
-            resp.getWriter().write(error);
-        }
+        ExchangeRatesDTO exchangeRate = exchangeRatesService.getExchangeRate(codesExchange);
+
+        String jsonRes = new Gson().toJson(exchangeRate);
+        resp.getWriter().write(jsonRes);
+
 
 
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        try{
-            String currencies = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/") + 1);
-            ValidationServlets.checkUpdateParameters(req.getParameter("rate"),currencies);
+        ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
 
+        String currencies = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/") + 1);
+        ValidationServlets.checkUpdateParameters(req.getParameter("rate"),currencies);    //place for validation
 
-            BigDecimal rate =  BigDecimal.valueOf(Double.parseDouble(req.getParameter("rate")));
+        BigDecimal rate =  new BigDecimal(req.getParameter("rate"));
+        ExchangeRatesDTO exchangeRate = exchangeRatesService.updateExchangeRates(currencies, rate);
 
-            ExchangeRatesService exchangeRatesService = new ExchangeRatesService();
+        String json = new Gson().toJson(exchangeRate);
+        resp.getWriter().write(json);
 
-
-            ExchangeRatesDTO exchangeRate = exchangeRatesService.updateExchangeRates(currencies, rate);
-
-            Gson gson = new Gson();
-            String json = gson.toJson(exchangeRate);
-            resp.getWriter().write(json);
-        }catch (Exception e){
-            String error = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),resp);
-            resp.getWriter().write(error);
-        }
     }
 
 }

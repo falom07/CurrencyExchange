@@ -1,9 +1,8 @@
 package DAO;
 
-import Entity.CurrencyEntity;
+import Entity.Currency;
 import Exceptions.DataAlreadyExistException;
 import Exceptions.DataDoesNotExistException;
-import Exceptions.EmptyFieldException;
 import Exceptions.SomeThingWrongWithBDException;
 import Utils.ConnectionManager;
 
@@ -12,84 +11,79 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
-    private static final CurrenciesDAO currenciesDAO;
+public class CurrenciesDAO implements CrudDAO<Currency>{
+    private static CurrenciesDAO currenciesDAO;
     private CurrenciesDAO(){}
-    static{
-        currenciesDAO = new CurrenciesDAO();
-    }
+
     public static CurrenciesDAO getInstance(){
+        if(currenciesDAO == null){
+            currenciesDAO =  new CurrenciesDAO();
+        }
         return currenciesDAO;
     }
 
 
 
     @Override
-    public CurrencyEntity add(CurrencyEntity currencyEntity)  {
+    public Currency add(Currency currency)  {
         String sql = "INSERT INTO Currencies(code, fullName, Sign) VALUES (?,?,?)";
 
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
-            preparedStatement.setString(1, currencyEntity.getCode());
-            preparedStatement.setString(2, currencyEntity.getFullName());
-            preparedStatement.setString(3, currencyEntity.getSign());
+            preparedStatement.setString(1, currency.getCode());
+            preparedStatement.setString(2, currency.getFullName());
+            preparedStatement.setString(3, currency.getSign());
 
             preparedStatement.executeUpdate();
 
 
         } catch (SQLException e) {
-            if (e.getErrorCode() == 19) {
-                throw new DataAlreadyExistException(currencyEntity.getCode());
+            if (e.getErrorCode() == 19) { // exception unique
+                throw new DataAlreadyExistException();
             }else{
                 throw new RuntimeException(e);
             }
         }
-        return currencyEntity;
+        return currency;
     }
 
     @Override
-    public List<CurrencyEntity> readAll() {
+    public List<Currency> readAll() {
         String sql = "select id,code,fullName,sign from Currencies";
-        List<CurrencyEntity> list = new ArrayList<>();
+        List<Currency> list = new ArrayList<>();
 
         try(Connection con = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
-
             while(resultSet.next()){
-                CurrencyEntity currencyEntity = new CurrencyEntity(
+                Currency currency = new Currency(
                         resultSet.getInt("id"),
                         resultSet.getString("code"),
                         resultSet.getString("fullName"),
                         resultSet.getString("sign")
                 );
-                list.add(currencyEntity);
+                list.add(currency);
 
             }
 
-
-
         } catch (SQLException e) {
-            if(e.getErrorCode() == 1) {
+            if(e.getErrorCode() == 1) {  //unknown exception
                 throw new SomeThingWrongWithBDException();
             }else {
                 throw new RuntimeException(e);
             }
         }
 
-
-
-
         return list;
     }
 
 
-
-    public CurrencyEntity readOne(String code) {
+    @Override
+    public Currency readOne(String code) {
         String sql = "select code,fullName,Sign from Currencies where code=?";
-        CurrencyEntity currency = new CurrencyEntity();
+        Currency currency = new Currency();
 
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -105,16 +99,14 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
             }
 
 
-        if(currency.getCode() == null) {
+        if(currency.getCode() == null) { // if data does not exist
             throw new SQLException();
         }
-
-
 
         }catch (SQLException e) {
             if(currency.getCode() == null) {
                 throw new DataDoesNotExistException();
-            }else if(e.getErrorCode() == 1){
+            }else if(e.getErrorCode() == 1){ //unknown exception
                 throw new SomeThingWrongWithBDException();
             }else{
                 throw new RuntimeException(e);

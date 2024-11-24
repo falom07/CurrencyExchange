@@ -8,4 +8,5 @@ import java.util.List;
 public interface CrudDAO<T> {
     T add(T t) throws SQLException;
     List<T> readAll() throws SomeThingWrongWithBDException;
+    T readOne(String code);
 }

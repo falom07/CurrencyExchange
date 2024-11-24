@@ -16,25 +16,17 @@ import java.io.IOException;
 public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        try{
-            CurrenciesService currenciesService = new CurrenciesService();
-            Gson gson = new Gson();
-            String result;
+        CurrenciesService currenciesService = new CurrenciesService();
 
-            int servletLength = req.getServletPath().length() + 1;
-            String code = req.getRequestURI().substring(servletLength);
-            Validation.ValidationServlets.checkCodeLengthCurrency(code);
-            CurrenciesDTO currenciesDTO = currenciesService.getCurrenciesByCode(code);
+        int servletLength = req.getServletPath().length() + 1;
+        String code = req.getRequestURI().substring(servletLength);
 
+        Validation.ValidationServlets.checkCodeLengthCurrency(code);    //place for validation
+        CurrenciesDTO currenciesDTO = currenciesService.getCurrenciesByCode(code);
 
-            result = gson.toJson(currenciesDTO, CurrenciesDTO.class);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(result);
-        }catch (Exception e){
-            String error = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),resp);
-            resp.getWriter().write(error);
-        }
+        String result = new Gson().toJson(currenciesDTO, CurrenciesDTO.class);
+        resp.getWriter().write(result);
+
 
 
     }

@@ -3,14 +3,11 @@ package Service;
 import DAO.ExchangeRatesDAO;
 import DTO.ExchangeCurrenciesRateDTO;
 import DTO.ExchangeRatesDTO;
-import Entity.CurrencyEntity;
-import Entity.ExchangeRateEntity;
-import Exceptions.DataDoesNotExistException;
-import Exceptions.EmptyFieldException;
+import Entity.Currency;
+import Entity.ExchangeRate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +15,14 @@ public class ExchangeRatesService {
     private final ExchangeRatesDAO exchangeRatesDAO  = ExchangeRatesDAO.getInstance();
 
     public ExchangeRatesDTO addExchangeRates(String baseCurrency,String targetCurrency, BigDecimal rate) {
-        ExchangeRateEntity exchangeRateEntity = new ExchangeRateEntity(
+        ExchangeRate exchangeRateEntity = new ExchangeRate(
                 rate,
-                new CurrencyEntity(baseCurrency),
-                new CurrencyEntity(targetCurrency)
+                new Currency(baseCurrency),
+                new Currency(targetCurrency)
         );
-        ExchangeRateEntity exchangeRate = exchangeRatesDAO.add(exchangeRateEntity);
+
+        ExchangeRate exchangeRate = exchangeRatesDAO.add(exchangeRateEntity);
+
         return new ExchangeRatesDTO(
                 exchangeRate.getBaseCurrency(),
                 exchangeRate.getTargetCurrency(),
@@ -31,14 +30,19 @@ public class ExchangeRatesService {
         );
 
     }
+
+
     public ExchangeRatesDTO updateExchangeRates(String currencies, BigDecimal rate) {
-        String [] currenciesArray = decryptionExchangeCode(currencies);
-        ExchangeRateEntity exchangeRateEntity = new ExchangeRateEntity(
+        String currenciesBase = currencies.substring(0, 3);    //take two codes for query
+        String currenciesTarget = currencies.substring(3, 6);
+        ExchangeRate exchangeRateEntity = new ExchangeRate(
                 rate,
-                new CurrencyEntity(currenciesArray[0]),
-                new CurrencyEntity(currenciesArray[1])
+                new Currency(currenciesBase),
+                new Currency(currenciesTarget)
         );
-        ExchangeRateEntity exchangeRate = exchangeRatesDAO.update(exchangeRateEntity);
+
+        ExchangeRate exchangeRate = exchangeRatesDAO.update(exchangeRateEntity);
+
         return new ExchangeRatesDTO(
                 exchangeRate.getBaseCurrency(),
                 exchangeRate.getTargetCurrency(),
@@ -50,52 +54,58 @@ public class ExchangeRatesService {
 
 
     public List<ExchangeRatesDTO> getAllExchangeRates() {
-        List<ExchangeRateEntity> exchangeRateEntities = exchangeRatesDAO.readAll();
+        List<ExchangeRate> exchangeRateEntities = exchangeRatesDAO.readAll();
         List<ExchangeRatesDTO> exchangeRates = new ArrayList<>();
-        for (ExchangeRateEntity exchangeRateEntity : exchangeRateEntities) {//todo maybe create separately method
+
+        for (ExchangeRate exchangeRate : exchangeRateEntities) {
             ExchangeRatesDTO exchangeRatesDTO = new ExchangeRatesDTO(
-                    exchangeRateEntity.getBaseCurrency(),
-                    exchangeRateEntity.getTargetCurrency(),
-                    exchangeRateEntity.getRate());
+                    exchangeRate.getBaseCurrency(),
+                    exchangeRate.getTargetCurrency(),
+                    exchangeRate.getRate());
             exchangeRates.add(exchangeRatesDTO);
         }
+
         return exchangeRates;
     }
+
+
     public ExchangeRatesDTO getExchangeRate(String exchangeCode) {
-        String [] decryptedCodes = decryptionExchangeCode(exchangeCode);
-        ExchangeRateEntity exchangeRateEntity = exchangeRatesDAO.readOne(decryptedCodes[0], decryptedCodes[1]);
+        ExchangeRate exchangeRate = exchangeRatesDAO.readOne(exchangeCode);
+
         ExchangeRatesDTO exchangeRatesDTO = new ExchangeRatesDTO(
-                exchangeRateEntity.getBaseCurrency(),
-                exchangeRateEntity.getTargetCurrency(),
-                exchangeRateEntity.getRate());
+                exchangeRate.getBaseCurrency(),
+                exchangeRate.getTargetCurrency(),
+                exchangeRate.getRate());
 
         return exchangeRatesDTO;
     }
-    private String[] decryptionExchangeCode(String exchangeCode) {
-        String [] codes = new String[2];
-        codes[0] = exchangeCode.substring(0, 3);
-        codes[1] = exchangeCode.substring(3, 6);
-        return codes;
 
-    }
 
-    public ExchangeCurrenciesRateDTO exchangeCurrencies(ExchangeCurrenciesRateDTO exchangeRatesDTO) {
 
-        ExchangeRateEntity exchangeRateEntity = exchangeRatesDAO.exchangeCurrencyRate(
-                new ExchangeRateEntity(
+    public ExchangeCurrenciesRateDTO exchangeCurrencies(String from, String to, BigDecimal amount) {
+        ExchangeCurrenciesRateDTO exchangeRatesDTO = new ExchangeCurrenciesRateDTO(
+                new Currency(from),
+                new Currency(to),
+                amount
+        );
+
+        ExchangeRate exchangeRate = exchangeRatesDAO.exchangeCurrencyRate(
+                new ExchangeRate(
                         exchangeRatesDTO.getBaseCurrency(),
                         exchangeRatesDTO.getTargetCurrency()
                 )
         );
-        ExchangeCurrenciesRateDTO exchangeCurrenciesRateDTO = new ExchangeCurrenciesRateDTO(
-                exchangeRateEntity.getBaseCurrency(),
-                exchangeRateEntity.getTargetCurrency(),
-                exchangeRateEntity.getRate(),
+
+        return new ExchangeCurrenciesRateDTO(
+                exchangeRate.getBaseCurrency(),
+                exchangeRate.getTargetCurrency(),
+                exchangeRate.getRate(),
                 exchangeRatesDTO.getAmount(),
-                countExchangeRate(exchangeRatesDTO.getAmount(),exchangeRateEntity.getRate())
+                countExchangeRate(exchangeRatesDTO.getAmount(), exchangeRate.getRate())
         );
-        return exchangeCurrenciesRateDTO;
     }
+
+
     private static BigDecimal countExchangeRate(BigDecimal mount,BigDecimal rate) {
         rate = rate.multiply(mount);
         return rate.setScale(2, RoundingMode.DOWN);

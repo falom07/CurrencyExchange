@@ -1,16 +1,15 @@
 package DAO;
 
 
-import Entity.CurrencyEntity;
-import Entity.ExchangeRateEntity;
+import Entity.Currency;
+import Entity.ExchangeRate;
 import Exceptions.DataAlreadyExistException;
 import Exceptions.DataDoesNotExistException;
-import Exceptions.EmptyFieldException;
+
 import Exceptions.SomeThingWrongWithBDException;
 import Utils.ConnectionManager;
 
-import javax.management.relation.RoleInfoNotFoundException;
-import java.math.BigDecimal;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,34 +17,39 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExchangeRatesDAO implements CrudDAO<ExchangeRateEntity> {
+public class ExchangeRatesDAO implements CrudDAO<ExchangeRate> {
     private ExchangeRatesDAO(){}
-    private static final ExchangeRatesDAO instance;
-    static{
-        instance = new ExchangeRatesDAO();
-    }
+    private static ExchangeRatesDAO instance;
+
     public static ExchangeRatesDAO getInstance(){
+        if(instance == null){
+            instance = new ExchangeRatesDAO();
+        }
         return instance;
     }
+
     @Override
-    public ExchangeRateEntity add(ExchangeRateEntity exchangeRateEntity) {
+    public ExchangeRate add(ExchangeRate exchangeRate) {
         String sql = """
                 insert into ExchangeRates (baseCurrencyId, targetCurrencyId, rate) 
                 values ((select id from Currencies where code = ?),
                 (select id from Currencies where code = ?),?)
                 """;
+
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-             preparedStatement.setString(1,exchangeRateEntity.getBaseCurrency().getCode());
-             preparedStatement.setString(2,exchangeRateEntity.getTargetCurrency().getCode());
-             preparedStatement.setBigDecimal(3,exchangeRateEntity.getRate());
+
+             preparedStatement.setString(1, exchangeRate.getBaseCurrency().getCode());
+             preparedStatement.setString(2, exchangeRate.getTargetCurrency().getCode());
+             preparedStatement.setBigDecimal(3, exchangeRate.getRate());
+
             System.out.println(preparedStatement.executeUpdate());
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            if(e.getMessage().startsWith("SQLITE_CONSTRAINT_UNIQUE", 1)){
-                throw new DataAlreadyExistException(exchangeRateEntity.getBaseCurrency().getCode() + exchangeRateEntity.getTargetCurrency().getCode());
-            }else if(e.getMessage().startsWith("SQLITE_CONSTRAINT_NOTNULL", 1)){
+
+            if(e.getMessage().startsWith("SQLITE_CONSTRAINT_UNIQUE", 1)){ //already exist
+                throw new DataAlreadyExistException();
+            }else if(e.getMessage().startsWith("SQLITE_CONSTRAINT_NOTNULL", 1)){ //some of data does not exist
                 throw new DataDoesNotExistException();
             }else if(e.getErrorCode() == 1){
                 throw new SomeThingWrongWithBDException();
@@ -53,39 +57,46 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRateEntity> {
                 throw new RuntimeException();
             }
         }
-        return readOne(exchangeRateEntity.getBaseCurrency().getCode(),exchangeRateEntity.getTargetCurrency().getCode());
 
+        return readOne(exchangeRate.getBaseCurrency().getCode() + exchangeRate.getTargetCurrency().getCode());
     }
+
+
     @Override
-    public List<ExchangeRateEntity> readAll() {
+    public List<ExchangeRate> readAll() {
         String sql = """
                 select ExchangeRates.id as id,baseCur.fullName as bName,baseCur.Sign as bSign,baseCur.code as bCode,tarCur.id as tId,baseCur.id as bId,tarCur.fullName as tName,tarCur.Sign as tSign,tarCur.code as tCode,rate from ExchangeRates
                             join Currencies as baseCur on baseCurrencyId = baseCur.id
                             join Currencies as tarCur on targetCurrencyId = tarCur.id
                 """;
-        List<ExchangeRateEntity> exchangeRateEntities = new ArrayList<>();
+        List<ExchangeRate> exchangeRateEntities = new ArrayList<>();
+
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
             ResultSet resultSet = preparedStatement.executeQuery();
+
             while (resultSet.next()) {
-                ExchangeRateEntity exchangeRateEntity = new ExchangeRateEntity(
+                ExchangeRate exchangeRate = new ExchangeRate(
                         resultSet.getInt("id"),
                         resultSet.getBigDecimal("rate"),
-                        new CurrencyEntity(
+                        new Currency(
                                 resultSet.getInt("tID"),
                                 resultSet.getString("tCode"),
                                 resultSet.getString("tName"),
                                 resultSet.getString("tSign")
-                        ),new CurrencyEntity(
+                        ),new Currency(
                                 resultSet.getInt("bId"),
                                 resultSet.getString("bCode"),
                                 resultSet.getString("bName"),
                                 resultSet.getString("bSign")
                         ));
-                exchangeRateEntities.add(exchangeRateEntity);
+
+                exchangeRateEntities.add(exchangeRate);
             }
+
         } catch (SQLException e) {
-            if (e.getErrorCode() == 1) {
+            if (e.getErrorCode() == 1) { //unknown exception
                 throw new SomeThingWrongWithBDException();
             }else {
                 throw new RuntimeException(e);
@@ -95,78 +106,92 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRateEntity> {
         return exchangeRateEntities;
     }
 
-    public ExchangeRateEntity update(ExchangeRateEntity exchangeRateEntity) {
+
+    public ExchangeRate update(ExchangeRate exchangeRate) {
         String sql = """
                 UPDATE ExchangeRates
                 set rate = ?
                 where baseCurrencyId = (select id from Currencies where code = ?) and targetCurrencyId = (select id from Currencies where code = ?);
                 """;
-        int result;
+        int result; // for info about update
+
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-            preparedStatement.setBigDecimal(1,exchangeRateEntity.getRate());
-            preparedStatement.setString(2,exchangeRateEntity.getBaseCurrency().getCode());
-            preparedStatement.setString(3, exchangeRateEntity.getTargetCurrency().getCode());
+
+            preparedStatement.setBigDecimal(1, exchangeRate.getRate());
+            preparedStatement.setString(2, exchangeRate.getBaseCurrency().getCode());
+            preparedStatement.setString(3, exchangeRate.getTargetCurrency().getCode());
+
             result = preparedStatement.executeUpdate();
 
 
         } catch (SQLException e) {
-           if (e.getErrorCode() == 1) {
+           if (e.getErrorCode() == 1) { //unknown exception
                 throw new SomeThingWrongWithBDException();
             }else {
                 throw new RuntimeException(e);
             }
         }
-        if (result == 0){
+
+        if (result == 0){ //if 0,then we know that data does not exist
             throw new DataDoesNotExistException();
         }
-        return readOne(exchangeRateEntity.getBaseCurrency().getCode(),exchangeRateEntity.getTargetCurrency().getCode());
+
+        return readOne(exchangeRate.getBaseCurrency().getCode() + exchangeRate.getTargetCurrency().getCode());
     }
 
-    public ExchangeRateEntity readOne(String baseCurrency, String targetCurrency) {
+    @Override
+    public ExchangeRate readOne(String exchangeCode) {
       String sql = """
               select ExchangeRates.id as id,baseCur.fullName as bName,baseCur.Sign as bSign,baseCur.code as bCode,baseCur.id as bId,tarCur.fullName as tName,tarCur.Sign as tSign,tarCur.id as tId,tarCur.code as tCode,rate from ExchangeRates
               join Currencies as baseCur on baseCurrencyId = baseCur.id
               join Currencies as tarCur on targetCurrencyId = tarCur.id
               where baseCur.code = ? and tarCur.code = ?;
               """;
-      ExchangeRateEntity exchangeRateEntity = null;
+      ExchangeRate exchangeRate = null;
+
       try(Connection connection = ConnectionManager.getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-          preparedStatement.setString(1, baseCurrency);
-          preparedStatement.setString(2, targetCurrency);
+
+          preparedStatement.setString(1, exchangeCode.substring(0, 3));
+          preparedStatement.setString(2, exchangeCode.substring(3, 6));
+
           ResultSet resultSet = preparedStatement.executeQuery();
+
           if (resultSet.next()) {
-              exchangeRateEntity = new ExchangeRateEntity(
+              exchangeRate = new ExchangeRate(
                       resultSet.getInt("id"),
                       resultSet.getBigDecimal("rate"),
-                      new CurrencyEntity(
+                      new Currency(
                               resultSet.getInt("tID"),
                               resultSet.getString("tCode"),
                               resultSet.getString("tName"),
                               resultSet.getString("tSign")
-                      ), new CurrencyEntity(
+                      ), new Currency(
                       resultSet.getInt("bId"),
                       resultSet.getString("bCode"),
                       resultSet.getString("bName"),
                       resultSet.getString("bSign")));
           }
 
-          if (exchangeRateEntity == null) {
+          if (exchangeRate == null) { //for check if data was found
               throw new DataDoesNotExistException();
           }
+
       }catch (SQLException e){
-          if (e.getErrorCode() == 1) {
+          if (e.getErrorCode() == 1) { //unknown exception
               throw new SomeThingWrongWithBDException();
           }else {
               throw new RuntimeException(e);
           }
       }
-      return exchangeRateEntity;
 
+      return exchangeRate;
     }
 
-    public ExchangeRateEntity exchangeCurrencyRate (ExchangeRateEntity exchangeRateEntity) {
+
+    public ExchangeRate exchangeCurrencyRate (ExchangeRate exchangeRate) {
+        //all logic in sql query,here also possible use much join instead of sub query,but I am stupid
         String sql = """
                 
                 WITH const AS (SELECT\s
@@ -225,20 +250,24 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRateEntity> {
                 join Currencies as tarCur on const.target = tarCur.id
                 
                 """;
+
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, exchangeRateEntity.getBaseCurrency().getCode());
-            preparedStatement.setString(2, exchangeRateEntity.getTargetCurrency().getCode());
+
+            preparedStatement.setString(1, exchangeRate.getBaseCurrency().getCode());
+            preparedStatement.setString(2, exchangeRate.getTargetCurrency().getCode());
+
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if(resultSet.next()) {
-                exchangeRateEntity = new ExchangeRateEntity(
+                exchangeRate = new ExchangeRate(
                         resultSet.getBigDecimal("rate"),
-                        new CurrencyEntity(
+                        new Currency(
                                 resultSet.getInt("tID"),
                                 resultSet.getString("tCode"),
                                 resultSet.getString("tName"),
                                 resultSet.getString("tSign")
-                        ), new CurrencyEntity(
+                        ), new Currency(
                         resultSet.getInt("bId"),
                         resultSet.getString("bCode"),
                         resultSet.getString("bName"),
@@ -246,17 +275,17 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRateEntity> {
                 )
                 );
             }
+
         } catch (SQLException e) {
-            if(e.getErrorCode() == 1){
+            if(e.getErrorCode() == 1){ //unknown query
                 throw new SomeThingWrongWithBDException();
             }else {
                 throw new RuntimeException(e);
             }
         }
-        if (exchangeRateEntity.getRate() == null){
+        if (exchangeRate.getRate() == null){ // check if did not find data
             throw new DataDoesNotExistException();
         }
-        return exchangeRateEntity;
-
+        return exchangeRate;
     }
 }

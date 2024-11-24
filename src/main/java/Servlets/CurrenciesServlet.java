@@ -20,48 +20,31 @@ import java.util.List;
 public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        resp.setContentType("application/json");
-        try {
-            CurrenciesService currenciesService = new CurrenciesService();
-            List<CurrenciesDTO> currencies = currenciesService.getAllCurrencies();
+        CurrenciesService currenciesService = new CurrenciesService();
 
-            String json = new Gson().toJson(currencies);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(json);
-        }catch (SomeThingWrongWithBDException e){
-            String error = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),resp);
-            resp.getWriter().write(error);
-        }
+        List<CurrenciesDTO> currencies = currenciesService.getAllCurrencies();
 
+        String json = new Gson().toJson(currencies);
+        resp.getWriter().write(json);
     }
-
-
-
 
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        try{
-            String code = req.getParameter("code");
-            String name = req.getParameter("name");
-            String sign = req.getParameter("sign");
+        CurrenciesService currenciesService = new CurrenciesService();
 
-            ValidationServlets.checkParametersForCorrect(code, name, sign);
+        String code = req.getParameter("code");
+        String name = req.getParameter("name");
+        String sign = req.getParameter("sign");
 
-            CurrenciesDTO currenciesDTO = new CurrenciesDTO(code.toUpperCase(), name, sign);
-            CurrenciesService currenciesService = new CurrenciesService();
-            CurrenciesDTO currenciesDTOResult =  currenciesService.add(currenciesDTO);
+        ValidationServlets.checkParametersForCorrect(code, name, sign);   //place for validation
 
-            String json = new Gson().toJson(currenciesDTOResult);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(json);
-        }catch (Exception e){
-            String error = ExceptionsHandler.getErrorMessage(e.getClass().getSimpleName(),resp);
-            resp.getWriter().write(error);
-        }
+        CurrenciesDTO currenciesDTO = new CurrenciesDTO(code.toUpperCase(), name, sign);
+        CurrenciesDTO currenciesDTOResult =  currenciesService.add(currenciesDTO);
+
+        String json = new Gson().toJson(currenciesDTOResult);
+        resp.getWriter().write(json);
+
 
     }
 }

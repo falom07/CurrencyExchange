@@ -2,45 +2,45 @@ package Entity;
 
 import java.math.BigDecimal;
 
-public class ExchangeRateEntity {
+public class ExchangeRate {
     private Integer id;
     private BigDecimal rate;
-    private CurrencyEntity baseCurrency;
-    private CurrencyEntity targetCurrency;
+    private Currency baseCurrency;
+    private Currency targetCurrency;
 
-    public ExchangeRateEntity(Integer id, BigDecimal rate, CurrencyEntity baseCurrency, CurrencyEntity targetCurrency) {
+    public ExchangeRate(Integer id, BigDecimal rate, Currency baseCurrency, Currency targetCurrency) {
         this.id = id;
         this.rate = rate;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
     }
 
-    public ExchangeRateEntity(BigDecimal rate, CurrencyEntity baseCurrency, CurrencyEntity targetCurrency) {
+    public ExchangeRate(BigDecimal rate, Currency baseCurrency, Currency targetCurrency) {
         this.rate = rate;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
     }
 
-    public ExchangeRateEntity(CurrencyEntity baseCurrency, CurrencyEntity targetCurrency) {
+    public ExchangeRate(Currency baseCurrency, Currency targetCurrency) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
     }
 
-    public ExchangeRateEntity() {}
+    public ExchangeRate() {}
 
-    public CurrencyEntity getBaseCurrency() {
+    public Currency getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(CurrencyEntity baseCurrency) {
+    public void setBaseCurrency(Currency baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
-    public CurrencyEntity getTargetCurrency() {
+    public Currency getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(CurrencyEntity targetCurrency) {
+    public void setTargetCurrency(Currency targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
 

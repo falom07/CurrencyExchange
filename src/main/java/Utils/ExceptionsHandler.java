@@ -3,17 +3,10 @@ package Utils;
 import jakarta.servlet.http.HttpServletResponse;
 
 public final class ExceptionsHandler {
-//    private static ExceptionsHandler exceptionsHandler;
-//    private ExceptionsHandler() {
-//    }
-//    static {
-//        exceptionsHandler = new ExceptionsHandler();
-//    }
-//    static ExceptionsHandler getInstance() {
-//        return exceptionsHandler;
-//    }
+
     public static String getErrorMessage(String nameException, HttpServletResponse resp) {
         String errorResponseMessage = "\"message\" : \"";
+
         switch (nameException) {
             case ("SomeThingWrongWithBDException"): //error 500
                 errorResponseMessage += "Something went wrong with DB,i need fix it.Sorry for inconveniences";
@@ -35,10 +28,14 @@ public final class ExceptionsHandler {
                 errorResponseMessage += "You have entered an invalid data";
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 break;
+            case ("PropertiesLoadException"): //error 500 of server
+                errorResponseMessage += "Property file was not found";
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             default:
                 errorResponseMessage += "I did not add message for this error,but it will added soon...";
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+
         return errorResponseMessage + "\"";
     }
 
