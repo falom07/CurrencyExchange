@@ -1,5 +1,69 @@
+###
 //get all currencies
-http://localhost:8080/currencies
+GET http://45.14.246.228:8080/CurrencyExchange/currencies
 
-//add currencies(you need postman for test this method becouse this method are POST with data x-www-form-urlencoded,three parametrs (name,sign,code))
-http://localhost:8080/currencies
+###
+//get one currency
+GET http://45.14.246.228:8080/CurrencyExchange/currency/USD
+
+###
+//save currency in db and return result
+POST http://45.14.246.228:8080/CurrencyExchange/currencies
+Content-Type: application/x-www-form-urlencoded
+
+//change code for check,because he can already exist
+name = vitalik&
+sign = ll&
+code = llK
+
+
+###
+//get all ExchangeRates
+GET http://45.14.246.228:8080/CurrencyExchange/exchangeRates
+
+###
+//get one ExchangeRates by codes name
+GET http://45.14.246.228:8080/CurrencyExchange/USDsss
+
+###
+//add Exchange rate
+POST http://45.14.246.228:8080/CurrencyExchange/exchangeRates
+Content-Type: application/x-www-form-urlencoded
+
+//change code for check
+baseCurrencyCode = KMO&
+targetCurrencyCode = sss&
+rate = 0.99
+
+###
+//update method
+POST http://45.14.246.228:8080/CurrencyExchange/exchangeRate/KMOsss
+Content-Type: application/x-www-form-urlencoded
+
+//indicate data
+rate = 0.67
+
+###
+//get exchange rate
+GET http://45.14.246.228:8080/CurrencyExchange/exchange?from=sss&to=USD&amount=15
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -47,7 +47,7 @@ public class CurrenciesServlet extends HttpServlet {
 
             ValidationServlets.checkParametersForCorrect(code, name, sign);
 
-            CurrenciesDTO currenciesDTO = new CurrenciesDTO(code, name, sign);
+            CurrenciesDTO currenciesDTO = new CurrenciesDTO(code.toUpperCase(), name, sign);
             CurrenciesService currenciesService = new CurrenciesService();
             CurrenciesDTO currenciesDTOResult =  currenciesService.add(currenciesDTO);
 

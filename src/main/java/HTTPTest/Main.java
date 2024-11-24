@@ -1,14 +1,18 @@
 package HTTPTest;
 
 import DAO.CurrenciesDAO;
-import Exceptions.SomeThingWrongWithBDException;
+import Entity.CurrencyEntity;
 
-import java.io.IOException;
+import java.io.File;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        CurrenciesDAO currenciesDAO = CurrenciesDAO.getInstance();
-        System.out.println(currenciesDAO.readAll().get(1));
+    public static void main(String[] args) {
+        File file = new File("identifier.sqlite");
+
+        // Get absolute path
+        String absolutePath = file.getAbsolutePath();
+        System.out.println(  absolutePath + "src/main/resources/db/identifier.sqlite");
 
     }
 }

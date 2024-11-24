@@ -5,9 +5,9 @@ import Exceptions.IncorrectDataExceptions;
 
 import java.math.BigDecimal;
 
-public final class ValidationServlets {
+public final class ValidationServlets { //class for validation
     private ValidationServlets() {}
-    public static void checkCodeLengthCurrency(String code) {
+    public static void checkCodeLengthCurrency(String code) { //check empty and isEmpty
         if(code.isEmpty()) {
             throw new EmptyFieldException();
         }else if(code.length() != 3) {

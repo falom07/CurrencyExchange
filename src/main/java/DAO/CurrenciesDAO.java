@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
     private static final CurrenciesDAO currenciesDAO;
     private CurrenciesDAO(){}
@@ -24,10 +25,12 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
 
 
     @Override
-    public CurrencyEntity add(CurrencyEntity currencyEntity){
+    public CurrencyEntity add(CurrencyEntity currencyEntity)  {
         String sql = "INSERT INTO Currencies(code, fullName, Sign) VALUES (?,?,?)";
+
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
             preparedStatement.setString(1, currencyEntity.getCode());
             preparedStatement.setString(2, currencyEntity.getFullName());
             preparedStatement.setString(3, currencyEntity.getSign());
@@ -49,6 +52,7 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
     public List<CurrencyEntity> readAll() {
         String sql = "select id,code,fullName,sign from Currencies";
         List<CurrencyEntity> list = new ArrayList<>();
+
         try(Connection con = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = con.prepareStatement(sql)){
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -94,6 +98,8 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
         if(currency.getCode() == null) {
             throw new SQLException();
         }
+
+
 
         }catch (SQLException e) {
             if(currency.getCode() == null) {
