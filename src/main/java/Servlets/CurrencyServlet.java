@@ -18,8 +18,7 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         CurrenciesService currenciesService = new CurrenciesService();
 
-        int servletLength = req.getServletPath().length() + 1;
-        String code = req.getRequestURI().substring(servletLength);
+        String code = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/") + 1);
 
         Validation.ValidationServlets.checkCodeLengthCurrency(code);    //place for validation
         CurrenciesDTO currenciesDTO = currenciesService.getCurrenciesByCode(code);

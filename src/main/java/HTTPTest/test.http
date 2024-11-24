@@ -4,7 +4,7 @@ GET http://45.14.246.228:8080/CurrencyExchange/currencies
 
 ###
 //get one currency
-GET http://45.14.246.228:8080/CurrencyExchange/currency/USD
+GET http://45.14.246.228:8080/CurrencyExchange/currency/CHF
 
 ###
 //save currency in db and return result

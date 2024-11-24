@@ -81,15 +81,15 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRate> {
                         resultSet.getInt("id"),
                         resultSet.getBigDecimal("rate"),
                         new Currency(
-                                resultSet.getInt("tID"),
-                                resultSet.getString("tCode"),
-                                resultSet.getString("tName"),
-                                resultSet.getString("tSign")
-                        ),new Currency(
                                 resultSet.getInt("bId"),
                                 resultSet.getString("bCode"),
                                 resultSet.getString("bName"),
                                 resultSet.getString("bSign")
+                        ),new Currency(
+                                resultSet.getInt("tID"),
+                                resultSet.getString("tCode"),
+                                resultSet.getString("tName"),
+                                resultSet.getString("tSign")
                         ));
 
                 exchangeRateEntities.add(exchangeRate);
@@ -163,15 +163,16 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRate> {
                       resultSet.getInt("id"),
                       resultSet.getBigDecimal("rate"),
                       new Currency(
+                              resultSet.getInt("bId"),
+                              resultSet.getString("bCode"),
+                              resultSet.getString("bName"),
+                              resultSet.getString("bSign")),
+                      new Currency(
                               resultSet.getInt("tID"),
                               resultSet.getString("tCode"),
                               resultSet.getString("tName"),
                               resultSet.getString("tSign")
-                      ), new Currency(
-                      resultSet.getInt("bId"),
-                      resultSet.getString("bCode"),
-                      resultSet.getString("bName"),
-                      resultSet.getString("bSign")));
+                      ));
           }
 
           if (exchangeRate == null) { //for check if data was found
@@ -263,16 +264,16 @@ public class ExchangeRatesDAO implements CrudDAO<ExchangeRate> {
                 exchangeRate = new ExchangeRate(
                         resultSet.getBigDecimal("rate"),
                         new Currency(
+                                resultSet.getInt("bId"),
+                                resultSet.getString("bCode"),
+                                resultSet.getString("bName"),
+                                resultSet.getString("bSign")),
+                        new Currency(
                                 resultSet.getInt("tID"),
                                 resultSet.getString("tCode"),
                                 resultSet.getString("tName"),
                                 resultSet.getString("tSign")
-                        ), new Currency(
-                        resultSet.getInt("bId"),
-                        resultSet.getString("bCode"),
-                        resultSet.getString("bName"),
-                        resultSet.getString("bSign")
-                )
+                        )
                 );
             }
 
