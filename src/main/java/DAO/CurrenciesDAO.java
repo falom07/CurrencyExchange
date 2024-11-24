@@ -54,8 +54,10 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
         List<CurrencyEntity> list = new ArrayList<>();
 
         try(Connection con = ConnectionManager.getConnection();
-            PreparedStatement preparedStatement = con.prepareStatement(sql)){
+            PreparedStatement preparedStatement = con.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
+
+
             while(resultSet.next()){
                 CurrencyEntity currencyEntity = new CurrencyEntity(
                         resultSet.getInt("id"),
@@ -68,6 +70,7 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
             }
 
 
+
         } catch (SQLException e) {
             if(e.getErrorCode() == 1) {
                 throw new SomeThingWrongWithBDException();
@@ -75,6 +78,10 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
                 throw new RuntimeException(e);
             }
         }
+
+
+
+
         return list;
     }
 
@@ -83,11 +90,14 @@ public class CurrenciesDAO implements CrudDAO<CurrencyEntity>{
     public CurrencyEntity readOne(String code) {
         String sql = "select code,fullName,Sign from Currencies where code=?";
         CurrencyEntity currency = new CurrencyEntity();
+
         try(Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
             preparedStatement.setString(1, code);
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getResultSet();
+
             if(resultSet.next()){
                 currency.setCode(resultSet.getString("code"));
                 currency.setFullName(resultSet.getString("fullName"));
